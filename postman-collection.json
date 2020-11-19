@@ -1,0 +1,160 @@
+{
+	"info": {
+		"_postman_id": "85663d86-e206-439c-af25-dcf49cb1cdc7",
+		"name": "ACS Bot Testing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Make Call",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bbec6b20-89ff-4cdd-843b-29e718d0cded",
+						"exec": [
+							"var callId = responseBody;\r",
+							"pm.collectionVariables.set(\"CallId\", callId.replace(\"\\\"\", \"\").replace(\"\\\"\", \"\"));\r",
+							"console.log(pm.collectionVariables.get(\"CallId\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ACSId\": \"8:acs:9845d259-b11a-4706-ba7d-0d71f938e112_00000006-0120-d609-d148-0848220003f0\"\r\n}"
+				},
+				"url": {
+					"raw": "https://{{RootUrl}}/api/makeCall",
+					"protocol": "https",
+					"host": [
+						"{{RootUrl}}"
+					],
+					"path": [
+						"api",
+						"makeCall"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Participant",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "f96d650b-ed95-45c9-88e3-c2aa6483f419",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ACSId\": \"8:acs:9845d259-b11a-4706-ba7d-0d71f938e112_00000006-0134-6fc4-6cf1-0548220002d7\"\r\n}"
+				},
+				"url": {
+					"raw": "https://{{RootUrl}}/api/calls/{{CallId}}/addParticipant",
+					"protocol": "https",
+					"host": [
+						"{{RootUrl}}"
+					],
+					"path": [
+						"api",
+						"calls",
+						"{{CallId}}",
+						"addParticipant"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Call",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://{{RootUrl}}/api/calls/{{CallId}}",
+					"protocol": "https",
+					"host": [
+						"{{RootUrl}}"
+					],
+					"path": [
+						"api",
+						"calls",
+						"{{CallId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "7dbbc6b4-11a5-4238-bb30-681064cbe392",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "67d39247-5eec-4bd4-9274-3a474b1dabad",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "8f6c39c5-46d7-4d82-a3a4-42d58ec8e310",
+			"key": "RootUrl",
+			"value": ""
+		},
+		{
+			"id": "1f40ee79-bb6b-4c92-bbda-f9296ff809cc",
+			"key": "CallId",
+			"value": ""
+		},
+		{
+			"id": "a86e6b47-44fa-4be2-bc17-6401b4830aba",
+			"key": "UserId1",
+			"value": ""
+		},
+		{
+			"id": "6b98a12e-b802-469c-a1a2-76e05c46e84f",
+			"key": "UserId2",
+			"value": ""
+		}
+	],
+	"protocolProfileBehavior": {}
+}

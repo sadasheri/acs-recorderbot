@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ServiceConfiguration serviceName="RecorderBot" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="6" osVersion="*" schemaVersion="2015-04.2.6">
+  <Role name="RecorderBotWorkerRole">
+    <Instances count="2" />
+    <ConfigurationSettings>
+      
+      <!-- Settings for Cloud Deployment -->
+
+      <!--Azure hosted App url e.g. contoso.cloudapp.net-->
+      <Setting name="AzureDnsName" value="%AzureDnsName%" />
+      <!-- Azure Certificate Fqdn e.g. bot.contoso.com -->
+      <Setting name="AzureCertFqdn" value="%AzureCertFqdn%" />
+      
+      <!-- Thumbprint of wildcard certificate for *.contoso.com-->
+      <Setting name="DefaultCertificate" value="ABC0000000000000000000000000000000000CBA" />
+      <Setting name="APPINSIGHTS_INSTRUMENTATIONKEY" value="%APPINSIGHTS_INSTRUMENTATIONKEY%" />
+      
+      <!--Settings for Local Deployment (No changes required here) '-->
+      <Setting name="NgrokTcpUrl" value="" />
+      <Setting name="NgrokWebFqdn" value="" />
+      <Setting name="NgrokTcpCertFqdn" value="" />
+      <Setting name="MediaLocalPort" value="" />
+      
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="" />
+    </ConfigurationSettings>
+    <Certificates>
+      <!-- Thumbprint of wildcard certificate for *.contoso.com-->
+      <Certificate name="Default" thumbprint="ABC0000000000000000000000000000000000CBA" thumbprintAlgorithm="sha1" />
+    </Certificates>
+  </Role>
+  <NetworkConfiguration>
+    <AddressAssignments>
+      <InstanceAddress roleName="RecorderBotWorkerRole">
+        <PublicIPs>
+          <PublicIP name="instancePublicIP" domainNameLabel="pip" />
+        </PublicIPs>
+      </InstanceAddress>
+    </AddressAssignments>
+  </NetworkConfiguration>
+</ServiceConfiguration>

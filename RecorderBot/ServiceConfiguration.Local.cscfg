@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ServiceConfiguration serviceName="RecorderBot" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="6" osVersion="*" schemaVersion="2015-04.2.6">
+  <Role name="RecorderBotWorkerRole">
+    <Instances count="1" />
+    <ConfigurationSettings>
+      
+      <!-- Settings for Local Deployment -->
+      
+      <!--Ngrok TCP Forwarding Url for Media e.g. 'tcp://2.tcp.ngrok.io:11029'-->
+      <Setting name="NgrokTcpUrl" value="%NgrokTcpUrl%" />
+      <!-- Ngrok Http/Https Forwarding Fqdn e.g. '123456789abc.ngrok.io' -->
+      <Setting name="NgrokWebFqdn" value="%NgrokWebFqdn%" />
+      <!-- Ngrok TCP Url Certificate Fqdn e.g. '2.bot.contoso.com' which is mapped to 2.tcp.ngrok.io using CNAME in DNS.-->
+      <Setting name="NgrokTcpCertFqdn" value="%NgrokTcpCertFqdn%" />
+      <!-- Local/Internal TCP Port (Only change when ngrok setting is changed) -->
+      <Setting name="MediaLocalPort" value="8445" />
+
+      <!-- Thumbprint of wildcard certificate for *.bot.contoso.com-->
+      <Setting name="DefaultCertificate" value="ABC0000000000000000000000000000000000CBA" />
+      
+      <!-- Settings for Cloud Deployment (No changes required here)-->
+      <Setting name="AzureDnsName" value="" />
+      <Setting name="AzureCertFqdn" value="" />
+      <Setting name="APPINSIGHTS_INSTRUMENTATIONKEY" value="" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
+    </ConfigurationSettings>
+    <Certificates>
+      <!-- Thumbprint of wildcard certificate for *.bot.contoso.com-->
+      <Certificate name="Default" thumbprint="ABC0000000000000000000000000000000000CBA" thumbprintAlgorithm="sha1" />
+    </Certificates>
+  </Role>
+  <NetworkConfiguration>
+    <AddressAssignments>
+      <InstanceAddress roleName="RecorderBotWorkerRole">
+        <PublicIPs>
+          <PublicIP name="instancePublicIP" domainNameLabel="pip" />
+        </PublicIPs>
+      </InstanceAddress>
+    </AddressAssignments>
+  </NetworkConfiguration>
+</ServiceConfiguration>

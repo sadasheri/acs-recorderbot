@@ -15,6 +15,7 @@ namespace Sample.RecorderBot.FrontEnd.Bot
     using System.Runtime.InteropServices;
     using System.Threading.Tasks;
     using Sample.Common.Logging;
+    using System.Net.Http;
 
     /// <summary>
     /// Call Handler Logic.
@@ -36,7 +37,7 @@ namespace Sample.RecorderBot.FrontEnd.Bot
 
             this.Call.CallStateChanged += OnCallStateChanged;
             this.Call.RemoteParticipantsUpdated += OnRemoteParticipantsUpdated;
-            this.Call.AudioSocket.AudioMediaReceived += this.OnAudioMediaReceived;
+           // this.Call.AudioSocket.AudioMediaReceived += this.OnAudioMediaReceived;
         }
 
         public async Task AddParticipantAsync(CommunicationIdentifier identifier)
@@ -64,6 +65,7 @@ namespace Sample.RecorderBot.FrontEnd.Bot
             /// <param name="e">Object containing list of added or removed participants.</param>
             private void OnRemoteParticipantsUpdated(object sender, ParticipantsUpdatedEventArgs e)
         {
+            logger.Info("Added Participants Count: " + e.AddedParticipants.Count());
             if (e.AddedParticipants.Count > 0)
             {
                 logger.Info("Call Participants Added: " + e.AddedParticipants.Count());
@@ -129,11 +131,14 @@ namespace Sample.RecorderBot.FrontEnd.Bot
                         identity = user.Id.Replace("8:acs:", "");
                     }
 
+                    logger.Info("Trying to store the audio for identity :" + identity);
+
                     StoreAudio(identity ?? "", buffer.Data, buffer.Length);
                 }
             }
             else    // P2P call as UnmixedAudioBuffers will not be available during a P2P call.
             {
+                logger.Info("Trying to store the audio for p2p");
                 StoreAudio("p2p", e.Buffer.Data, e.Buffer.Length);
             }
             e.Buffer.Dispose();
@@ -149,6 +154,11 @@ namespace Sample.RecorderBot.FrontEnd.Bot
                 stream.AppendWaveData(bytes);
             }
         }
+
+
+
+
+
 
         /// <summary>
         /// Gets the identitySet of the participant corresponding to the given MSI.
@@ -175,6 +185,22 @@ namespace Sample.RecorderBot.FrontEnd.Bot
         private static RemoteParticipant GetParticipantFromMSI(Call call, uint msi)
         {
             return call.RemoteParticipants.SingleOrDefault(x => x.MediaStreams.Any(y => y.SourceId == msi.ToString()));
+        }
+
+        public void StartPHQ()
+        {
+            this.Call.AudioSocket.AudioMediaReceived += this.OnAudioMediaReceived;
+        }
+
+        public StreamContent EndPHQ(string acsUserId)
+        {
+            this.Call.AudioSocket.AudioMediaReceived -= this.OnAudioMediaReceived;
+            return RetrieveAudio(acsUserId);
+        }
+
+        private StreamContent RetrieveAudio(string acsUserId)
+        {
+            return new StreamContent(new FileStream($"audio_{acsUserId}.wav", FileMode.Open, FileAccess.Read));
         }
 
     }

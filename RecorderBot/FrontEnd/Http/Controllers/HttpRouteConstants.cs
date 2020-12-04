@@ -60,5 +60,15 @@ namespace Sample.RecorderBot.FrontEnd.Http
         /// Route for adding participant request.
         /// </summary>
         public const string OnAddParticipantRoute = CallRoutePrefix + "/addParticipant";
+
+        /// <summary>
+        /// Route for starting the recording.
+        /// </summary>
+        public const string OnStartPHQ = CallRoutePrefix + "/startPHQ";
+
+        /// <summary>
+        /// Route for ending the recording.
+        /// </summary>
+        public const string OnEndPHQ = CallRoutePrefix + "/endPHQ";
     }
 }

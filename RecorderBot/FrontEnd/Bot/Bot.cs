@@ -114,13 +114,18 @@ namespace Sample.RecorderBot.FrontEnd.Bot
             var source = new CallingApplication(this.ACSApplicationInstanceId);
             var targets = new List<CommunicationIdentifier>() { new CommunicationUser(participant.ACSId) };
             
+            if(participant.ACSId2 !=null && participant.ACSId2 != String.Empty)
+            {
+                targets.Add(new CommunicationUser(participant.ACSId2));
+            }
+
             var call = await this.Client.CallAsync(source, targets, new StartCallOptions() { CallbackUri = this.CallbackUrl, AudioOptions = new AudioOptions() { ReceiveUnmixedMeetingAudio = true, StreamDirection = Azure.Communication.Calls.StreamDirection.SendReceive } });
             call.CallStateChanged += OnCallStateChanged;
 
             var callHandler = new CallHandler(call, this.Logger);
             this.CallHandlers.TryAdd(call.Id, callHandler);
             
-            this.Logger.Info($"Call creation complete: {call.Id}");
+            this.Logger.Info($"Call creation complete: {call.Id} with current Call State: {call.State.ToString()}");
 
             return call.Id;
         }
@@ -166,11 +171,27 @@ namespace Sample.RecorderBot.FrontEnd.Bot
 
             if (call.State == CallState.Disconnected)
             {
+                this.Logger.Info($"Call Id: {call.Id} with current State: {call.State.ToString()}");
                 if (this.CallHandlers.TryRemove(call.Id.ToString(), out CallHandler handler))
                 {
                     handler.Dispose();
                 }
             }
+        }
+
+        public void StartPHQ(string callLegId)
+        {
+            this.CallHandlers[callLegId].StartPHQ();
+        }
+
+        /// <summary>
+        /// End PHQ.
+        /// </summary>
+        /// <param name="callLegId">The call leg id.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        public StreamContent EndPHQ(string callLegId, string acsUserId)
+        {
+            return this.CallHandlers[callLegId].EndPHQ(acsUserId);
         }
     }
 }

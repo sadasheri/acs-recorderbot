@@ -12,6 +12,8 @@ namespace Sample.RecorderBot.FrontEnd.Http
     using Sample.RecorderBot.Models;
     using Sample.RecorderBot.FrontEnd.Bot;
     using Sample.Common.Logging;
+    using System.IO;
+    using System.Net.Http.Headers;
 
     /// <summary>
     /// Entry point for handling call-related web hook requests from Skype Platform.
@@ -33,7 +35,7 @@ namespace Sample.RecorderBot.FrontEnd.Http
         [Route(HttpRouteConstants.OnIncomingRequestRoute)]
         public async Task<HttpResponseMessage> OnIncomingRequestAsync()
         {
-            this.Logger.Info($"Received HTTP {this.Request.Method}, {this.Request.RequestUri}");
+            this.Logger.Info($"Received HTTP {this.Request.Method}, {this.Request.RequestUri}, {this.Request.Content}");
 
             // Pass the incoming message to the sdk. The sdk takes care of what to do with it.
             var response = await Bot.Instance.Client.ProcessNotificationAsync(this.Request).ConfigureAwait(false);
@@ -107,5 +109,47 @@ namespace Sample.RecorderBot.FrontEnd.Http
                 throw e;
             }
         }
+
+        /// <summary>
+        /// End PHQ
+        /// </summary>
+        /// <param name="callLegId">The call leg id.</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route(HttpRouteConstants.OnEndPHQ)]
+        public async Task<string> EndPHQ(string callLegId, string acsUserId)
+        {
+            try
+            {
+                StreamContent stream = Bot.Instance.EndPHQ(callLegId, acsUserId);
+                string filePath = $"audio_{acsUserId}.wav";
+
+                using (var httpClient = new HttpClient())
+                {
+                    using (var form = new MultipartFormDataContent())
+                    {
+                        using (var streamContent = stream)
+                        {
+                            using (var fileContent = new ByteArrayContent(await streamContent.ReadAsByteArrayAsync()))
+                            {
+                                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data");
+
+                                // "file" parameter name should be the same as the server side input parameter name
+                                form.Add(fileContent, "file", Path.GetFileName(filePath));
+                                HttpResponseMessage response = await httpClient.PostAsync("https://api.kintsugihello.com/predict/all", form);
+                                return response.Content.ReadAsStringAsync().Result;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                this.Logger.Error($"Error while recoding audio {e.InnerException} :: {e.StackTrace}");
+                return "Internal Error";
+            }
+        }
     }
+
+
 }

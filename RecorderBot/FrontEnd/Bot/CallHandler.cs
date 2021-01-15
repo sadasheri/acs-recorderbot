@@ -37,7 +37,7 @@ namespace Sample.RecorderBot.FrontEnd.Bot
 
             this.Call.CallStateChanged += OnCallStateChanged;
             this.Call.RemoteParticipantsUpdated += OnRemoteParticipantsUpdated;
-           // this.Call.AudioSocket.AudioMediaReceived += this.OnAudioMediaReceived;
+            // this.Call.AudioSocket.AudioMediaReceived += this.OnAudioMediaReceived;
         }
 
         public async Task AddParticipantAsync(CommunicationIdentifier identifier)
@@ -121,25 +121,34 @@ namespace Sample.RecorderBot.FrontEnd.Bot
         {
             if (e.Buffer.UnmixedAudioBuffers != null)
             {
+                logger.Info("UnmixedAudioBuffers is not null");
                 foreach (var buffer in e.Buffer.UnmixedAudioBuffers)
                 {
                     var activeSpeakerIdentifier = GetParticipantIdentitySetFromMSI(this.Call, buffer.ActiveSpeakerId);
+                    logger.Info("activeSpeakerIdentifier :" + activeSpeakerIdentifier);
                     string identity = "";
                     if (activeSpeakerIdentifier is CommunicationUser)
                     {
                         var user = activeSpeakerIdentifier as CommunicationUser;
                         identity = user.Id.Replace("8:acs:", "");
+                        logger.Info("Trying to store the audio for identity :" + identity);
                     }
 
-                    logger.Info("Trying to store the audio for identity :" + identity);
+                    if(activeSpeakerIdentifier is PhoneNumber)
+                    {
+                        var phoneIdentity = activeSpeakerIdentifier as PhoneNumber;
+                        identity = phoneIdentity.Value;
+                        logger.Info("Trying to store the audio for Phonenumber :" + identity);
+                    }
 
                     StoreAudio(identity ?? "", buffer.Data, buffer.Length);
                 }
             }
             else    // P2P call as UnmixedAudioBuffers will not be available during a P2P call.
             {
-                logger.Info("Trying to store the audio for p2p");
-                StoreAudio("p2p", e.Buffer.Data, e.Buffer.Length);
+                
+                logger.Info($"Trying to store the audio for p2p_{this.Call.Id}");
+                StoreAudio($"p2p_{this.Call.Id}", e.Buffer.Data, e.Buffer.Length);
             }
             e.Buffer.Dispose();
         }
@@ -195,11 +204,16 @@ namespace Sample.RecorderBot.FrontEnd.Bot
         public StreamContent EndPHQ(string acsUserId)
         {
             this.Call.AudioSocket.AudioMediaReceived -= this.OnAudioMediaReceived;
+            this.logger.Info("Recording Ended");
             return RetrieveAudio(acsUserId);
         }
 
         private StreamContent RetrieveAudio(string acsUserId)
         {
+            // FileStream fileStream = new FileStream($"audio_{acsUserId}.wav", FileMode.Open, FileAccess.Read);
+            //StreamContent streamContent =  new StreamContent(fileStream);
+            // fileStream.Close();
+            this.logger.Info("Current directory :" + System.Environment.CurrentDirectory);
             return new StreamContent(new FileStream($"audio_{acsUserId}.wav", FileMode.Open, FileAccess.Read));
         }
 

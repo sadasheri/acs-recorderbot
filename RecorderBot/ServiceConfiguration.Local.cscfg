@@ -3,9 +3,7 @@
   <Role name="RecorderBotWorkerRole">
     <Instances count="1" />
     <ConfigurationSettings>
-      
       <!-- Settings for Local Deployment -->
-      
       <!--Ngrok TCP Forwarding Url for Media e.g. 'tcp://2.tcp.ngrok.io:11029'-->
       <Setting name="NgrokTcpUrl" value="%NgrokTcpUrl%" />
       <!-- Ngrok Http/Https Forwarding Fqdn e.g. '123456789abc.ngrok.io' -->
@@ -14,14 +12,12 @@
       <Setting name="NgrokTcpCertFqdn" value="%NgrokTcpCertFqdn%" />
       <!-- Local/Internal TCP Port (Only change when ngrok setting is changed) -->
       <Setting name="MediaLocalPort" value="8445" />
-
       <!-- Thumbprint of wildcard certificate for *.bot.contoso.com-->
       <Setting name="DefaultCertificate" value="ABC0000000000000000000000000000000000CBA" />
-      
       <!-- Settings for Cloud Deployment (No changes required here)-->
       <Setting name="AzureDnsName" value="" />
       <Setting name="AzureCertFqdn" value="" />
-      <Setting name="APPINSIGHTS_INSTRUMENTATIONKEY" value="" />
+      <Setting name="APPINSIGHTS_INSTRUMENTATIONKEY" value="1b39df18-9b9e-4f85-88f6-543408137dc2" />
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
     </ConfigurationSettings>
     <Certificates>

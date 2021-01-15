@@ -3,24 +3,29 @@
   <Role name="RecorderBotWorkerRole">
     <Instances count="2" />
     <ConfigurationSettings>
+      
       <!-- Settings for Cloud Deployment -->
+
       <!--Azure hosted App url e.g. contoso.cloudapp.net-->
-      <Setting name="AzureDnsName" value="ovcpacsbot.cloudapp.net" />
+      <Setting name="AzureDnsName" value="%AzureDnsName%" />
       <!-- Azure Certificate Fqdn e.g. bot.contoso.com -->
-      <Setting name="AzureCertFqdn" value="ovc-acsbot-poc.optum.com" />
+      <Setting name="AzureCertFqdn" value="%AzureCertFqdn%" />
+      
       <!-- Thumbprint of wildcard certificate for *.contoso.com-->
-      <Setting name="DefaultCertificate" value="973B2FE924DE5A074115968036876B60C935E14C" />
-      <Setting name="APPINSIGHTS_INSTRUMENTATIONKEY" value="1b39df18-9b9e-4f85-88f6-543408137dc2" />
+      <Setting name="DefaultCertificate" value="ABC0000000000000000000000000000000000CBA" />
+      <Setting name="APPINSIGHTS_INSTRUMENTATIONKEY" value="%APPINSIGHTS_INSTRUMENTATIONKEY%" />
+      
       <!--Settings for Local Deployment (No changes required here) '-->
       <Setting name="NgrokTcpUrl" value="" />
       <Setting name="NgrokWebFqdn" value="" />
       <Setting name="NgrokTcpCertFqdn" value="" />
       <Setting name="MediaLocalPort" value="" />
+      
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="" />
     </ConfigurationSettings>
     <Certificates>
       <!-- Thumbprint of wildcard certificate for *.contoso.com-->
-      <Certificate name="Default" thumbprint="973B2FE924DE5A074115968036876B60C935E14C" thumbprintAlgorithm="sha1" />
+      <Certificate name="Default" thumbprint="ABC0000000000000000000000000000000000CBA" thumbprintAlgorithm="sha1" />
     </Certificates>
   </Role>
   <NetworkConfiguration>

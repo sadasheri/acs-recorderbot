@@ -16,6 +16,12 @@ namespace Sample.RecorderBot.Models
             this.TargetType = targetType;
         }
 
+        public TargetParticipant(string acsId, TargetType targetType)
+        {
+            this.ACSId = acsId;
+            this.TargetType = targetType;
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TargetParticipant"/> class.
         /// </summary>

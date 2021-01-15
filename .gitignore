@@ -45,3 +45,15 @@ src/coverage
 # System Files
 .DS_Store
 Thumbs.db
+/.vs/RecorderBot/v16
+/packages
+/RecorderBot/csx/Release
+/RecorderBot/bin
+/RecorderBot/FrontEnd/bin
+/RecorderBot/FrontEnd/obj
+/RecorderBot/FrontEnd/app.config.original
+/RecorderBot/obj
+/RecorderBot/Profiles
+/RecorderBot/RecorderBotWorkerRole/obj
+/RecorderBot/RecorderBotWorkerRole/bin
+/RecorderBot/RecorderBotWorkerRole/app.config.original

@@ -17,11 +17,13 @@ namespace Sample.RecorderBot.FrontEnd.Http
     using Sample.RecorderBot.FrontEnd.Bot;
     using Sample.Common.Logging;
     using Newtonsoft.Json;
+    using System.Web.Http.Cors;
 
     /// <summary>
     /// DemoController serves as the gateway to explore the bot.
     /// From here you can get a list of calls, and functions for each call.
     /// </summary>
+    [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class DemoController : ApiController
     {
         /// <summary>

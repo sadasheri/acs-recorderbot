@@ -69,6 +69,11 @@ namespace Sample.RecorderBot.FrontEnd.Http
         /// <summary>
         /// Route for ending the recording.
         /// </summary>
-        public const string OnEndPHQ = CallRoutePrefix + "/endPHQ";
+        public const string OnEndPHQ = CallRoutePrefix + "/endPHQ/{acsUserId}";
+
+        /// <summary>
+        /// Route for ending the recording & get the recorded file.
+        /// </summary>
+        public const string OnEndPHQFileRead = CallRoutePrefix + "/endPHQ/getFile/{acsUserId}";
     }
 }

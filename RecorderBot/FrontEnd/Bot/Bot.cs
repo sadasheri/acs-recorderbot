@@ -32,6 +32,8 @@ namespace Sample.RecorderBot.FrontEnd.Bot
         /// </summary>
         public Logger Logger { get; private set; }
 
+        // public log4net.ILog Logger { get;  set; } = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         /// <summary>
         /// Gets the sample log observer.
         /// </summary>
@@ -41,6 +43,8 @@ namespace Sample.RecorderBot.FrontEnd.Bot
         /// Gets the collection of call handlers.
         /// </summary>
         public ConcurrentDictionary<string, CallHandler> CallHandlers { get; } = new ConcurrentDictionary<string, CallHandler>();
+
+        public ConcurrentDictionary<string, CallHandler> CallHandlersCopy { get; } = new ConcurrentDictionary<string, CallHandler>();
 
         /// <summary>
         /// The call client.
@@ -117,6 +121,7 @@ namespace Sample.RecorderBot.FrontEnd.Bot
             if(participant.ACSId2 !=null && participant.ACSId2 != String.Empty)
             {
                 targets.Add(new CommunicationUser(participant.ACSId2));
+               
             }
 
             var call = await this.Client.CallAsync(source, targets, new StartCallOptions() { CallbackUri = this.CallbackUrl, AudioOptions = new AudioOptions() { ReceiveUnmixedMeetingAudio = true, StreamDirection = Azure.Communication.Calls.StreamDirection.SendReceive } });
@@ -124,7 +129,9 @@ namespace Sample.RecorderBot.FrontEnd.Bot
 
             var callHandler = new CallHandler(call, this.Logger);
             this.CallHandlers.TryAdd(call.Id, callHandler);
-            
+            this.CallHandlersCopy.TryAdd(call.Id, callHandler);
+
+
             this.Logger.Info($"Call creation complete: {call.Id} with current Call State: {call.State.ToString()}");
 
             return call.Id;
@@ -149,6 +156,22 @@ namespace Sample.RecorderBot.FrontEnd.Bot
             }
 
             CommunicationIdentifier target = new CommunicationUser(targetParticipant.ACSId);
+
+            if (this.CallHandlers.ContainsKey(callLegId))
+            {
+                this.Logger.Info($"callLedId {callLegId} present, adding participant");
+            }
+            else
+            {
+                this.Logger.Info($"callLedId {callLegId} NOT present to add participant");
+                if (this.CallHandlersCopy.ContainsKey(callLegId))
+                {
+                    this.Logger.Info($"callLedId {callLegId} present in CallHandlersCopy");
+                    this.CallHandlers.TryAdd(callLegId, this.CallHandlersCopy[callLegId]);
+                    this.Logger.Info($"callLedId {callLegId} Copied from CallHandlersCopy to CallHandlers");
+                }
+            }
+
             await this.CallHandlers[callLegId].AddParticipantAsync(target).ConfigureAwait(false);
         }
 
@@ -176,12 +199,31 @@ namespace Sample.RecorderBot.FrontEnd.Bot
                 {
                     handler.Dispose();
                 }
+                if (this.CallHandlersCopy.TryRemove(call.Id.ToString(), out CallHandler handlerCopy))
+                {
+                    handlerCopy.Dispose();
+                }
             }
         }
 
         public void StartPHQ(string callLegId)
         {
-            this.CallHandlers[callLegId].StartPHQ();
+            if (this.CallHandlers.ContainsKey(callLegId))
+            {
+                this.CallHandlers[callLegId].StartPHQ();
+            } else
+            {
+                this.Logger.Info($"callLedId : {callLegId} not found to startPHQ");
+                if (this.CallHandlersCopy.ContainsKey(callLegId))
+                {
+                    this.Logger.Info($"callLedId {callLegId} present in CallHandlersCopy to startPHQ");
+                    this.CallHandlers.TryAdd(callLegId, this.CallHandlersCopy[callLegId]);
+                    this.Logger.Info($"callLedId {callLegId} Copied from CallHandlersCopy to CallHandlers at startPHQ");
+                    this.CallHandlers[callLegId].StartPHQ();
+                }
+                // throw new Exception($"callLedId : {callLegId} not found to startPHQ");
+            }
+            
         }
 
         /// <summary>
@@ -191,7 +233,15 @@ namespace Sample.RecorderBot.FrontEnd.Bot
         /// <returns>The <see cref="Task"/>.</returns>
         public StreamContent EndPHQ(string callLegId, string acsUserId)
         {
-            return this.CallHandlers[callLegId].EndPHQ(acsUserId);
+            if (this.CallHandlers.ContainsKey(callLegId))
+            {
+                return this.CallHandlers[callLegId].EndPHQ(acsUserId);
+            }
+            else
+            {
+                throw new Exception($"callLegId : {callLegId} not found to endPHQ");
+            }
+            
         }
     }
 }

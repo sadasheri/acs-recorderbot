@@ -12,6 +12,7 @@ namespace Sample.RecorderBot.FrontEnd.Http
 {
     using System.Net;
     using System.Web.Http;
+    using System.Web.Http.Cors;
     using System.Web.Http.ExceptionHandling;
     using Microsoft.Owin.Logging;
     using Owin;
@@ -30,6 +31,8 @@ namespace Sample.RecorderBot.FrontEnd.Http
         public void ConfigureSettings(IAppBuilder app, Logger logger)
         {
             HttpConfiguration httpConfig = new HttpConfiguration();
+            var cors = new EnableCorsAttribute("*", "*", "*");
+            httpConfig.EnableCors(cors);
             httpConfig.MapHttpAttributeRoutes();
             httpConfig.MessageHandlers.Add(new LoggingMessageHandler(isIncomingMessageHandler: true, logger: logger, urlIgnorers: new[] { "/api/logs" }));
 

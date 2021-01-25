@@ -48,7 +48,7 @@ namespace Sample.RecorderBot.FrontEnd.Http
         [Route(HttpRouteConstants.Logs + "/")]
         public HttpResponseMessage OnGetLogs(
             int skip = 0,
-            int take = 1000)
+            int take = int.MaxValue)
         {
             var logs = this.Observer.GetLogs(skip, take);
 
@@ -71,7 +71,7 @@ namespace Sample.RecorderBot.FrontEnd.Http
         public HttpResponseMessage OnGetLogs(
             string filter,
             int skip = 0,
-            int take = 1000)
+            int take = int.MaxValue)
         {
             var logs = this.Observer.GetLogs(filter, skip, take);
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ServiceConfiguration serviceName="RecorderBot" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="6" osVersion="*" schemaVersion="2015-04.2.6">
   <Role name="RecorderBotWorkerRole">
-    <Instances count="2" />
+    <Instances count="1" />
     <ConfigurationSettings>
       <!-- Settings for Cloud Deployment -->
       <!--Azure hosted App url e.g. contoso.cloudapp.net-->

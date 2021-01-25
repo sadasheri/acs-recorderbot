@@ -109,7 +109,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Graph.Communications.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>$(PackagesDir)\Azure.Communication.Calls.1.0.102820-prerelease\lib\net462\Microsoft.Graph.Communications.Common.dll</HintPath>
+      <HintPath>$(PackagesDir)\Azure.Communication.Calls.1.0.0\lib\net462\Microsoft.Graph.Communications.Common.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

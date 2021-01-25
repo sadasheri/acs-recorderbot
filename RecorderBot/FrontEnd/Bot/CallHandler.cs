@@ -40,9 +40,9 @@ namespace Sample.RecorderBot.FrontEnd.Bot
             // this.Call.AudioSocket.AudioMediaReceived += this.OnAudioMediaReceived;
         }
 
-        public async Task AddParticipantAsync(CommunicationIdentifier identifier)
+        public async Task AddParticipantAsync(CommunicationIdentifier identifier,PhoneNumber phoneNumber)
         {
-            await this.Call.AddParticipantAsync(identifier).ConfigureAwait(false);
+            await this.Call.AddParticipantAsync(identifier, phoneNumber).ConfigureAwait(false);
         }
 
         public async Task HangupCallAsync()
@@ -137,7 +137,7 @@ namespace Sample.RecorderBot.FrontEnd.Bot
                     if(activeSpeakerIdentifier is PhoneNumber)
                     {
                         var phoneIdentity = activeSpeakerIdentifier as PhoneNumber;
-                        identity = phoneIdentity.Value;
+                        identity = $"{this.Call.Id}_{phoneIdentity.Value}";
                         logger.Info("Trying to store the audio for Phonenumber :" + identity);
                     }
 

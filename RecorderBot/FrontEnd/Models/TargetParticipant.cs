@@ -9,10 +9,10 @@ namespace Sample.RecorderBot.Models
         /// <param name="acsId">The acs id.</param>
         /// <param name="targetType">Whether the object is application.</param>
         /// <param name="displayName">The display name.</param>
-        public TargetParticipant(string acsId, string acsId2, TargetType targetType)
+        public TargetParticipant(string acsId, string phoneNumber, TargetType targetType)
         {
             this.ACSId = acsId;
-            this.ACSId2 = acsId2;
+            this.PhoneNumber = phoneNumber;
             this.TargetType = targetType;
         }
 
@@ -33,7 +33,7 @@ namespace Sample.RecorderBot.Models
         /// Gets or sets the acs id.
         /// </summary>
         public string ACSId { get; set; }
-        public string ACSId2 { get; set; }
+        public string PhoneNumber { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the acs id is user.

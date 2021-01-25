@@ -44,7 +44,6 @@ namespace Sample.RecorderBot.FrontEnd.Bot
         /// </summary>
         public ConcurrentDictionary<string, CallHandler> CallHandlers { get; } = new ConcurrentDictionary<string, CallHandler>();
 
-        public ConcurrentDictionary<string, CallHandler> CallHandlersCopy { get; } = new ConcurrentDictionary<string, CallHandler>();
 
         /// <summary>
         /// The call client.
@@ -118,19 +117,17 @@ namespace Sample.RecorderBot.FrontEnd.Bot
             var source = new CallingApplication(this.ACSApplicationInstanceId);
             var targets = new List<CommunicationIdentifier>() { new CommunicationUser(participant.ACSId) };
             
-            if(participant.ACSId2 !=null && participant.ACSId2 != String.Empty)
-            {
-                targets.Add(new CommunicationUser(participant.ACSId2));
+            //if(participant.ACSId2 !=null && participant.ACSId2 != String.Empty)
+            //{
+            //    targets.Add(new CommunicationUser(participant.ACSId2));
                
-            }
+            //}
 
-            var call = await this.Client.CallAsync(source, targets, new StartCallOptions() { CallbackUri = this.CallbackUrl, AudioOptions = new AudioOptions() { ReceiveUnmixedMeetingAudio = true, StreamDirection = Azure.Communication.Calls.StreamDirection.SendReceive } });
+            var call = await this.Client.CallAsync(source, targets, new StartCallOptions() { CallbackUri = this.CallbackUrl, MediaHost = MediaHost.Service, AudioOptions = new AudioOptions() { ReceiveUnmixedMeetingAudio = true, StreamDirection = Azure.Communication.Calls.StreamDirection.SendReceive } });
             call.CallStateChanged += OnCallStateChanged;
 
             var callHandler = new CallHandler(call, this.Logger);
             this.CallHandlers.TryAdd(call.Id, callHandler);
-            this.CallHandlersCopy.TryAdd(call.Id, callHandler);
-
 
             this.Logger.Info($"Call creation complete: {call.Id} with current Call State: {call.State.ToString()}");
 
@@ -150,29 +147,31 @@ namespace Sample.RecorderBot.FrontEnd.Bot
                 throw new ArgumentNullException(nameof(callLegId));
             }
 
-            if (string.IsNullOrEmpty(targetParticipant.ACSId))
-            {
-                throw new ArgumentNullException(nameof(targetParticipant.ACSId));
-            }
-
-            CommunicationIdentifier target = new CommunicationUser(targetParticipant.ACSId);
-
+            //if (string.IsNullOrEmpty(targetParticipant.ACSId))
+            //{
+            //    throw new ArgumentNullException(nameof(targetParticipant.ACSId));
+            //}
             if (this.CallHandlers.ContainsKey(callLegId))
             {
                 this.Logger.Info($"callLedId {callLegId} present, adding participant");
             }
             else
             {
-                this.Logger.Info($"callLedId {callLegId} NOT present to add participant");
-                if (this.CallHandlersCopy.ContainsKey(callLegId))
-                {
-                    this.Logger.Info($"callLedId {callLegId} present in CallHandlersCopy");
-                    this.CallHandlers.TryAdd(callLegId, this.CallHandlersCopy[callLegId]);
-                    this.Logger.Info($"callLedId {callLegId} Copied from CallHandlersCopy to CallHandlers");
-                }
+                this.Logger.Info($"callLedId {callLegId} NOT present to add participant");                
             }
 
-            await this.CallHandlers[callLegId].AddParticipantAsync(target).ConfigureAwait(false);
+            if (targetParticipant.ACSId != null && targetParticipant.ACSId != "")
+            {
+                CommunicationIdentifier target = new CommunicationUser(targetParticipant.ACSId);               
+
+                await this.CallHandlers[callLegId].AddParticipantAsync(target, null).ConfigureAwait(false);
+            }
+            else
+            {
+                var alternateIdentity = new PhoneNumber("+18883151731");
+                var targetPhn= new PhoneNumber(targetParticipant.PhoneNumber);
+                await this.CallHandlers[callLegId].AddParticipantAsync(targetPhn, alternateIdentity).ConfigureAwait(false);
+            }
         }
 
         /// <summary>
@@ -197,11 +196,8 @@ namespace Sample.RecorderBot.FrontEnd.Bot
                 this.Logger.Info($"Call Id: {call.Id} with current State: {call.State.ToString()}");
                 if (this.CallHandlers.TryRemove(call.Id.ToString(), out CallHandler handler))
                 {
+                    this.Logger.Warn($"Call Id:  {call.Id} is diposed in  MakeCall() OnCallStateChanged event");
                     handler.Dispose();
-                }
-                if (this.CallHandlersCopy.TryRemove(call.Id.ToString(), out CallHandler handlerCopy))
-                {
-                    handlerCopy.Dispose();
                 }
             }
         }
@@ -211,17 +207,11 @@ namespace Sample.RecorderBot.FrontEnd.Bot
             if (this.CallHandlers.ContainsKey(callLegId))
             {
                 this.CallHandlers[callLegId].StartPHQ();
-            } else
+            } 
+            else
             {
-                this.Logger.Info($"callLedId : {callLegId} not found to startPHQ");
-                if (this.CallHandlersCopy.ContainsKey(callLegId))
-                {
-                    this.Logger.Info($"callLedId {callLegId} present in CallHandlersCopy to startPHQ");
-                    this.CallHandlers.TryAdd(callLegId, this.CallHandlersCopy[callLegId]);
-                    this.Logger.Info($"callLedId {callLegId} Copied from CallHandlersCopy to CallHandlers at startPHQ");
-                    this.CallHandlers[callLegId].StartPHQ();
-                }
-                // throw new Exception($"callLedId : {callLegId} not found to startPHQ");
+                this.Logger.Info($"callLedId : {callLegId} not found to startPHQ");                
+                throw new Exception($"callLedId : {callLegId} not found to startPHQ");
             }
             
         }
